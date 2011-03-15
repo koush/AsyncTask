@@ -11,14 +11,6 @@ using async = System.Collections.IEnumerator;
 
 namespace AsyncTask
 {
-    class Foo
-    {
-        public static Foo operator ++(Foo c1)
-        {
-            return c1;
-        }
-    }
-
     class Program
     {
         static async Test1()
