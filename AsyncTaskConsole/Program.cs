@@ -13,6 +13,28 @@ namespace AsyncTask
 {
     class Program
     {
+		// here's the callback spaghetti for a normal asynchronous workflow
+		static void Test1WithoutAsync()
+		{
+			// download the google home page
+			var google = new WebClient();
+			google.DownloadStringCompleted += (e, r) =>
+				{
+					// find and download the first link on the google home page
+					Regex regex = new Regex("href=\"(?<href>http://.*?)\"");
+					var match = regex.Match(r.Result);
+					var firstHref = match.Groups["href"].Value;
+
+					var firstHrefClient = new WebClient();
+					firstHrefClient.DownloadStringCompleted += (e2, r2) =>
+						{
+							Console.WriteLine(r2.Result);
+						};
+					firstHrefClient.DownloadStringAsync(new Uri(firstHref));
+				};
+			google.DownloadStringAsync(new Uri("http://www.google.com"));
+		}
+
         static async Test1()
         {
             // download the google home page
@@ -58,15 +80,15 @@ namespace AsyncTask
 
         static void Main(string[] args)
         {
-            var test1 = new AsyncTask<string>(Test1());
+			var test1 = Test1().Async<string>();
             test1.Start();
 
-            var test2 = new AsyncTask<string>(Test2());
+			var test2 = Test2().Async<string>();
             test2.Start();
             
             Console.WriteLine();
 
-            var test3 = new AsyncTask<string>(Test3());
+			var test3 = Test3().Async<string>();
             test3.Start();
 
             Task.WaitAll(test1, test2);

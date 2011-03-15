@@ -21,7 +21,7 @@ using System.Text.RegularExpressions;
 
 namespace AsyncTaskWpf
 {
-    public class DispatcherAsyncTask : Task, ContinueWithTask
+    public class DispatcherAsyncTask : Task, IContinueWithTask
     {
         Dispatcher mDispatcher;
         public DispatcherAsyncTask(Dispatcher dispatcher)
@@ -33,14 +33,21 @@ namespace AsyncTaskWpf
 
         void Continue(Task t)
         {
-            mDispatcher.BeginInvoke(mAction, t);
+			mDispatcher.BeginInvoke(mAction, t);
         }
 
-        public Action<Task> mAction;
-        void ContinueWithTask.ContinueWith(Action<Task> action)
-        {
-            mAction = action;
-        }
+		Action<Task> mAction;
+		Action<Task> IContinueWithTask.ContinueWith
+		{
+			get
+			{
+				return mAction; 
+			}
+			set
+			{
+				mAction = value;
+			}
+		}
     }
 
     public static class Extensions
@@ -82,7 +89,7 @@ namespace AsyncTaskWpf
 
         private void button1_Click(object sender, RoutedEventArgs e)
         {
-            var test1 = new AsyncTask.AsyncTask(DispatcherTest());
+			var test1 = DispatcherTest().Async();
             test1.Start();
         }
     }
