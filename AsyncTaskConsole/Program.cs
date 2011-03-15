@@ -19,14 +19,14 @@ namespace AsyncTask
         }
     }
 
-	class Program
-	{
-		static async Test1()
-		{
+    class Program
+    {
+        static async Test1()
+        {
             // download the google home page
-			WebClient client = new WebClient();
-			var google = client.DownloadStringTask("http://www.google.com");
-			yield return google;
+            WebClient client = new WebClient();
+            var google = client.DownloadStringTask("http://www.google.com");
+            yield return google;
             // find and download the first link on the google home page
             Regex regex = new Regex("href=\"(?<href>http://.*?)\"");
             var match = regex.Match(google.Result);
@@ -64,8 +64,8 @@ namespace AsyncTask
             throw new Exception("Testing an exception");
         }
 
-		static void Main(string[] args)
-		{
+        static void Main(string[] args)
+        {
             var test1 = new AsyncTask<string>(Test1());
             test1.Start();
 
@@ -94,5 +94,5 @@ namespace AsyncTask
             }
 
         }
-	}
+    }
 }
