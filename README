@@ -1,0 +1,4 @@
+Neat hack demonstrating how to use iterators to simulate C#'s async/await keyword.
+
+Check out the Dispatcher sample in the Wpf project to see how AsyncTask can also be used
+to control thread affinity.
