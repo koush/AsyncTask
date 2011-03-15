@@ -1,8 +1,0 @@
-c:\users\koush\documents\visual studio 2010\Projects\ConsoleApplication3\ConsoleApplication3\obj\x86\Debug\ResolveAssemblyReference.cache
-c:\users\koush\documents\visual studio 2010\Projects\ConsoleApplication3\ConsoleApplication3\bin\Debug\ConsoleApplication3.exe
-c:\users\koush\documents\visual studio 2010\Projects\ConsoleApplication3\ConsoleApplication3\bin\Debug\ConsoleApplication3.pdb
-c:\users\koush\documents\visual studio 2010\Projects\ConsoleApplication3\ConsoleApplication3\obj\x86\Debug\ConsoleApplication3.exe
-c:\users\koush\documents\visual studio 2010\Projects\ConsoleApplication3\ConsoleApplication3\obj\x86\Debug\ConsoleApplication3.pdb
-c:\Users\koush\Documents\Visual Studio 2010\Projects\ConsoleApplication3\ConsoleApplication3\bin\Debug\ConsoleApplication3.exe.config
-C:\Users\koush\Documents\Visual Studio 2010\Projects\ConsoleApplication3\ConsoleApplication3\bin\Debug\ParallelExtensionsExtras.dll
-C:\Users\koush\Documents\Visual Studio 2010\Projects\ConsoleApplication3\ConsoleApplication3\bin\Debug\ParallelExtensionsExtras.pdb

@@ -1,5 +1,0 @@
-C:\Users\koush\Desktop\ParallelExtensionsExtras\bin\Debug\ParallelExtensionsExtras.dll
-C:\Users\koush\Desktop\ParallelExtensionsExtras\bin\Debug\ParallelExtensionsExtras.pdb
-C:\Users\koush\Desktop\ParallelExtensionsExtras\obj\Debug\ResolveAssemblyReference.cache
-C:\Users\koush\Desktop\ParallelExtensionsExtras\obj\Debug\ParallelExtensionsExtras.dll
-C:\Users\koush\Desktop\ParallelExtensionsExtras\obj\Debug\ParallelExtensionsExtras.pdb
