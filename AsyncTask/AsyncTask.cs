@@ -42,10 +42,23 @@ namespace AsyncTask
             set;
         }
     }
+
+    public interface ContinueWithTask
+    {
+        void ContinueWith(Action<Task> action);
+    }
+
+    public class AsyncTask : AsyncTask<object>
+    {
+        public AsyncTask(async tasks)
+            : base(tasks, new State<object>(new ManualResetEvent(false)))
+        {
+        }
+    }
     
     public class AsyncTask<T> : Task<T>
 	{
-        void Continue(Task previous)
+        public virtual void Continue(Task previous)
         {
             if (previous != null && previous.Exception != null)
             {
@@ -64,7 +77,7 @@ namespace AsyncTask
                         Task<T> final = previous as Task<T>;
                         if (final != null)
                             mState.Result = final.Result;
-                        else
+                        else if (GetType() != typeof(AsyncTask))
                             mState.Exception = new Exception(String.Format("Task ended with a result that was not of Type {0}.", typeof(T)));
                     }
                     mState.Event.Set();
@@ -82,7 +95,11 @@ namespace AsyncTask
             Task t = o as Task;
             if (t != null)
             {
-                t.ContinueWith(Continue);
+                ContinueWithTask c = t as ContinueWithTask;
+                if (c != null)
+                    c.ContinueWith(Continue);
+                else
+                    t.ContinueWith(Continue);
                 if (mState.OriginatingThread == Thread.CurrentThread)
                     t.Start();
                 else
@@ -106,7 +123,7 @@ namespace AsyncTask
 
 		async mEnumerator;
         State<T> mState;
-        AsyncTask(async tasks, State<T> state)
+        internal AsyncTask(async tasks, State<T> state)
             : base(delegate { return Do(tasks, state); })
 		{
 			mEnumerator = tasks;

@@ -1,7 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsyncTask", "AsyncTask\AsyncTask.csproj", "{A23E1F91-FB70-4D8C-AC75-0F837623A4C0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsyncTaskConsole", "AsyncTaskConsole\AsyncTaskConsole.csproj", "{A23E1F91-FB70-4D8C-AC75-0F837623A4C0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsyncTask", "AsyncTask\AsyncTask.csproj", "{DA8799FC-024B-486E-A5FB-9062903F8B14}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsyncTaskWpf", "AsyncTaskWpf\AsyncTaskWpf.csproj", "{561BF8F3-CB2B-47DF-B074-386FFD2DE3AE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -14,22 +18,40 @@ Global
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{A23E1F91-FB70-4D8C-AC75-0F837623A4C0}.Debug|Any CPU.ActiveCfg = Debug|x86
-		{A23E1F91-FB70-4D8C-AC75-0F837623A4C0}.Debug|Any CPU.Build.0 = Debug|x86
 		{A23E1F91-FB70-4D8C-AC75-0F837623A4C0}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
 		{A23E1F91-FB70-4D8C-AC75-0F837623A4C0}.Debug|Mixed Platforms.Build.0 = Debug|x86
 		{A23E1F91-FB70-4D8C-AC75-0F837623A4C0}.Debug|x86.ActiveCfg = Debug|x86
 		{A23E1F91-FB70-4D8C-AC75-0F837623A4C0}.Debug|x86.Build.0 = Debug|x86
 		{A23E1F91-FB70-4D8C-AC75-0F837623A4C0}.Release|Any CPU.ActiveCfg = Release|x86
-		{A23E1F91-FB70-4D8C-AC75-0F837623A4C0}.Release|Any CPU.Build.0 = Release|x86
 		{A23E1F91-FB70-4D8C-AC75-0F837623A4C0}.Release|Mixed Platforms.ActiveCfg = Release|x86
 		{A23E1F91-FB70-4D8C-AC75-0F837623A4C0}.Release|Mixed Platforms.Build.0 = Release|x86
 		{A23E1F91-FB70-4D8C-AC75-0F837623A4C0}.Release|x86.ActiveCfg = Release|x86
 		{A23E1F91-FB70-4D8C-AC75-0F837623A4C0}.Release|x86.Build.0 = Release|x86
-	EndGlobalSection
-	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = AsyncTask\AsyncTask.csproj
+		{DA8799FC-024B-486E-A5FB-9062903F8B14}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA8799FC-024B-486E-A5FB-9062903F8B14}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA8799FC-024B-486E-A5FB-9062903F8B14}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{DA8799FC-024B-486E-A5FB-9062903F8B14}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{DA8799FC-024B-486E-A5FB-9062903F8B14}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{DA8799FC-024B-486E-A5FB-9062903F8B14}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA8799FC-024B-486E-A5FB-9062903F8B14}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA8799FC-024B-486E-A5FB-9062903F8B14}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{DA8799FC-024B-486E-A5FB-9062903F8B14}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{DA8799FC-024B-486E-A5FB-9062903F8B14}.Release|x86.ActiveCfg = Release|Any CPU
+		{561BF8F3-CB2B-47DF-B074-386FFD2DE3AE}.Debug|Any CPU.ActiveCfg = Debug|x86
+		{561BF8F3-CB2B-47DF-B074-386FFD2DE3AE}.Debug|Mixed Platforms.ActiveCfg = Debug|x86
+		{561BF8F3-CB2B-47DF-B074-386FFD2DE3AE}.Debug|Mixed Platforms.Build.0 = Debug|x86
+		{561BF8F3-CB2B-47DF-B074-386FFD2DE3AE}.Debug|x86.ActiveCfg = Debug|x86
+		{561BF8F3-CB2B-47DF-B074-386FFD2DE3AE}.Debug|x86.Build.0 = Debug|x86
+		{561BF8F3-CB2B-47DF-B074-386FFD2DE3AE}.Release|Any CPU.ActiveCfg = Release|x86
+		{561BF8F3-CB2B-47DF-B074-386FFD2DE3AE}.Release|Mixed Platforms.ActiveCfg = Release|x86
+		{561BF8F3-CB2B-47DF-B074-386FFD2DE3AE}.Release|Mixed Platforms.Build.0 = Release|x86
+		{561BF8F3-CB2B-47DF-B074-386FFD2DE3AE}.Release|x86.ActiveCfg = Release|x86
+		{561BF8F3-CB2B-47DF-B074-386FFD2DE3AE}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = AsyncTask\AsyncTask.csproj
 	EndGlobalSection
 EndGlobal

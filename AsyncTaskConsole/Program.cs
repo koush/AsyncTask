@@ -31,7 +31,7 @@ namespace AsyncTask
             Regex regex = new Regex("href=\"(?<href>http://.*?)\"");
             var match = regex.Match(google.Result);
             var firstHref = match.Groups["href"].Value;
-            var firstHrefTask = TaskHelper.Create(client.DownloadString, firstHref);
+            var firstHrefTask = client.DownloadStringTask(firstHref);
             yield return firstHrefTask;
         }
 
