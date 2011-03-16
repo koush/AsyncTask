@@ -61,7 +61,7 @@ namespace AsyncTask
             }
         }
 
-        static bool mNeedsHack = Type.GetType("Mono.Runtime") != null;
+		static bool mNeedsHack = Environment.OSVersion.Platform != PlatformID.Win32NT && Environment.OSVersion.Platform != PlatformID.Win32S && Environment.OSVersion.Platform != PlatformID.Win32Windows && Environment.OSVersion.Platform != PlatformID.WinCE && Environment.OSVersion.Platform != PlatformID.Xbox;
         static System.Reflection.MethodInfo mExecute = typeof(Task).GetMethod("Execute", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Default | System.Reflection.BindingFlags.Instance);
 
         bool TryExecuteTaskHack(Task task)
@@ -92,6 +92,7 @@ namespace AsyncTask
 
         protected override void QueueTask(Task task)
         {
+			Console.WriteLine("Queueing {0} from {1}.", task, Thread.CurrentThread.ManagedThreadId);
             var atask = task as IAsyncTask;
 
             // see if this is a async task or the async continuation task
@@ -103,7 +104,7 @@ namespace AsyncTask
 
         protected override bool TryExecuteTaskInline(Task task, bool taskWasPreviouslyQueued)
         {
-            return true;
+            return false;
         }
 
         protected override IEnumerable<Task> GetScheduledTasks()
@@ -185,43 +186,41 @@ namespace AsyncTask
     internal class AsyncMethodTask : AsyncMethodTask<object>
     {
         public AsyncMethodTask(async tasks)
-            : base(tasks, new State<object>(new ManualResetEvent(false)))
+            : base(tasks)
         {
         }
     }
 
-    internal class AsyncMethodTask<T> : Task<T>
+    internal class AsyncMethodTask<T> : AsyncTask<T>
     {
-        public virtual void Continue(Task previous)
+        public void Continue(Task previous)
         {
             if (previous != null && previous.Exception != null)
             {
-                mState.Exception = previous.Exception;
-                mState.Event.Set();
+				OnException(previous.Exception);
+				return;
             }
 
             try
             {
                 if (!mEnumerator.MoveNext())
                 {
-                    if (previous == null)
-                        mState.Exception = new Exception("Task ended without a result.");
-                    else
-                    {
-                        Task<T> final = previous as Task<T>;
-                        if (final != null)
-                            mState.Result = final.Result;
-                        else if (GetType() != typeof(AsyncMethodTask))
-                            mState.Exception = new Exception(String.Format("Task ended with a result that was not of Type {0}.", typeof(T)));
-                    }
-                    mState.Event.Set();
+					if (previous == null)
+						OnException(new Exception("Task ended without a result."));
+					else
+					{
+						Task<T> final = previous as Task<T>;
+						if (final != null)
+							OnCompleted(final.Result);
+						else if (GetType() != typeof(AsyncMethodTask))
+							OnException(new Exception(String.Format("Task ended with a result that was not of Type {0}.", typeof(T))));
+					}
                     return;
                 }
             }
             catch (Exception ex)
             {
-                mState.Exception = ex;
-                mState.Event.Set();
+				OnException(ex);
                 return;
             }
 
@@ -243,33 +242,21 @@ namespace AsyncTask
             }
             else
             {
-                mState.Result = (T)o;
-                mState.Event.Set();
+				OnCompleted((T)o);
             }
         }
 
-        static T Do(async tasks, State<T> state)
-        {
-            state.Task.Continue(null);
-            state.Event.WaitOne();
-            if (state.Exception != null)
-                throw state.Exception;
-            return state.Result;
-        }
+		static void Start(Task t)
+		{
+			AsyncMethodTask<T> self = t as AsyncMethodTask<T>;
+			self.Continue(null);
+		}
 
         async mEnumerator;
-        State<T> mState;
-        internal AsyncMethodTask(async tasks, State<T> state)
-            : base(delegate { return Do(tasks, state); }, TaskCreationOptions.PreferFairness)
+        internal AsyncMethodTask(async tasks)
+            : base(Start)
         {
             mEnumerator = tasks;
-            mState = state;
-            mState.Task = this;
-        }
-
-        public AsyncMethodTask(async tasks)
-            : this(tasks, new State<T>(new ManualResetEvent(false)))
-        {
         }
     }
 
@@ -304,14 +291,20 @@ namespace AsyncTask
 
     public static class TaskHelper
     {
-        public static Task<T> Async<T>(this async async)
+        public static Task<T> Yield<T>(this async async)
         {
-            return new AsyncMethodTask<T>(async);
+			var ret = new AsyncMethodTask<T>(async);
+			ret.Start(AsyncTaskScheduler.Instance);
+			//ret.Start();
+            return ret;
         }
 
-        public static Task Async(this async async)
+        public static Task Yield(this async async)
         {
-            return new AsyncMethodTask(async);
+            var ret = new AsyncMethodTask(async);
+			ret.Start(AsyncTaskScheduler.Instance);
+			//ret.Start();
+			return ret;
         }
 
         /*

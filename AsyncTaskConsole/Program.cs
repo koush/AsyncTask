@@ -80,16 +80,13 @@ namespace AsyncTask
 
         static void Main(string[] args)
         {
-            var test1 = Test1().Async<string>();
-            test1.Start();
+            var test1 = Test1().Yield<string>();
 
-            var test2 = Test2().Async<string>();
-            test2.Start();
+            var test2 = Test2().Yield<string>();
             
             Console.WriteLine();
 
-            var test3 = Test3().Async<string>();
-            test3.Start();
+            var test3 = Test3().Yield<string>();
 
             Task.WaitAll(test1, test2);
 

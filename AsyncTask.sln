@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsyncTask", "AsyncTask\Asyn
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsyncTaskWpf", "AsyncTaskWpf\AsyncTaskWpf.csproj", "{561BF8F3-CB2B-47DF-B074-386FFD2DE3AE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AsyncTaskAndroid", "AsyncTaskAndroid\AsyncTaskAndroid.csproj", "{1952C6B3-E2C0-4075-AAAA-7D9A9C1F0815}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -47,6 +49,20 @@ Global
 		{561BF8F3-CB2B-47DF-B074-386FFD2DE3AE}.Release|Mixed Platforms.Build.0 = Release|x86
 		{561BF8F3-CB2B-47DF-B074-386FFD2DE3AE}.Release|x86.ActiveCfg = Release|x86
 		{561BF8F3-CB2B-47DF-B074-386FFD2DE3AE}.Release|x86.Build.0 = Release|x86
+		{1952C6B3-E2C0-4075-AAAA-7D9A9C1F0815}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1952C6B3-E2C0-4075-AAAA-7D9A9C1F0815}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1952C6B3-E2C0-4075-AAAA-7D9A9C1F0815}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{1952C6B3-E2C0-4075-AAAA-7D9A9C1F0815}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{1952C6B3-E2C0-4075-AAAA-7D9A9C1F0815}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{1952C6B3-E2C0-4075-AAAA-7D9A9C1F0815}.Debug|Mixed Platforms.Deploy.0 = Debug|Any CPU
+		{1952C6B3-E2C0-4075-AAAA-7D9A9C1F0815}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{1952C6B3-E2C0-4075-AAAA-7D9A9C1F0815}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1952C6B3-E2C0-4075-AAAA-7D9A9C1F0815}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1952C6B3-E2C0-4075-AAAA-7D9A9C1F0815}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{1952C6B3-E2C0-4075-AAAA-7D9A9C1F0815}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{1952C6B3-E2C0-4075-AAAA-7D9A9C1F0815}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{1952C6B3-E2C0-4075-AAAA-7D9A9C1F0815}.Release|Mixed Platforms.Deploy.0 = Release|Any CPU
+		{1952C6B3-E2C0-4075-AAAA-7D9A9C1F0815}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

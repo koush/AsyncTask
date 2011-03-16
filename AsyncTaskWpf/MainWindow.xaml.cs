@@ -79,8 +79,8 @@ namespace AsyncTaskWpf
 
         private void button1_Click(object sender, RoutedEventArgs e)
         {
-			var test1 = DispatcherTest().Async();
-            test1.Start();
+			var test1 = DispatcherTest().Yield();
+            //test1.Start();
         }
     }
 }
