@@ -22,33 +22,6 @@ namespace AsyncTask
         }
     }
 
-    internal class State<T> : StateBase<T>
-    {
-        public State(ManualResetEvent ev)
-        {
-            Event = ev;
-            OriginatingThread = Thread.CurrentThread;
-        }
-
-        public ManualResetEvent Event
-        {
-            get;
-            set;
-        }
-
-        public AsyncMethodTask<T> Task
-        {
-            get;
-            set;
-        }
-
-        public Thread OriginatingThread
-        {
-            get;
-            set;
-        }
-    }
-
     public class AsyncTaskScheduler : TaskScheduler
     {
         static AsyncTaskScheduler mScheduler = new AsyncTaskScheduler();
@@ -99,7 +72,7 @@ namespace AsyncTask
             if (atask == null)
                 Run(task);
             else
-                atask.Start(task);
+                atask.StartAsync();
         }
 
         protected override bool TryExecuteTaskInline(Task task, bool taskWasPreviouslyQueued)
@@ -113,18 +86,14 @@ namespace AsyncTask
         }
     }
 
-    public interface IAsyncTask
-    {
-        Action<Task> Start
-        {
-            get;
-        }
-    }
+	public interface IAsyncTask
+	{
+		void StartAsync();
+	}
 
     public class AsyncTask : AsyncTask<object>
     {
-        public AsyncTask(Action<Task> start)
-            : base(start)
+        public AsyncTask()
         {
         }
 
@@ -150,10 +119,9 @@ namespace AsyncTask
             mState = state;
         }
 
-        public AsyncTask(Action<Task> action)
+        public AsyncTask()
             : this(new StateBase<T>())
         {
-            mStart = action;
         }
 
         protected void OnCompleted(T result)
@@ -173,15 +141,15 @@ namespace AsyncTask
             AsyncTaskScheduler.Instance.Run(this);
         }
 
-        Action<Task> mStart;
-        Action<Task> IAsyncTask.Start
+        protected virtual void StartAsync()
         {
-            get
-            {
-                return mStart;
-            }
         }
-    }
+
+		void IAsyncTask.StartAsync()
+		{
+			StartAsync();
+		}
+	}
 
     internal class AsyncMethodTask : AsyncMethodTask<object>
     {
@@ -246,15 +214,13 @@ namespace AsyncTask
             }
         }
 
-		static void Start(Task t)
+		protected override void StartAsync()
 		{
-			AsyncMethodTask<T> self = t as AsyncMethodTask<T>;
-			self.Continue(null);
+			Continue(null);
 		}
 
         async mEnumerator;
         internal AsyncMethodTask(async tasks)
-            : base(Start)
         {
             mEnumerator = tasks;
         }
@@ -262,24 +228,22 @@ namespace AsyncTask
 
     class WebClientDownloadStringTask : AsyncTask<string>
     {
-        static void Start(Task task)
+		protected override void StartAsync()
         {
-            var self = task as WebClientDownloadStringTask;
             DownloadStringCompletedEventHandler handler = null;
             handler = (e, a) =>
             {
-                self.mClient.DownloadStringCompleted -= handler;
+                mClient.DownloadStringCompleted -= handler;
                 if (a.Error == null)
-                    self.OnCompleted(a.Result);
+                    OnCompleted(a.Result);
                 else
-                    self.OnException(a.Error);
+                    OnException(a.Error);
             };
-            self.mClient.DownloadStringCompleted += handler;
-            self.mClient.DownloadStringAsync(new Uri(self.mUrl));
+            mClient.DownloadStringCompleted += handler;
+            mClient.DownloadStringAsync(new Uri(mUrl));
         }
 
         public WebClientDownloadStringTask(WebClient client, string url)
-            : base(Start)
         {
             mClient = client;
             mUrl = url;

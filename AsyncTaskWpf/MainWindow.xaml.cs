@@ -23,18 +23,16 @@ namespace AsyncTaskWpf
 {
     public class DispatcherTask : AsyncTask.AsyncTask
     {
-        static void Start(Task t)
-        {
-            var self = t as DispatcherTask;
-            self.mDispatcher.BeginInvoke(new Action(() =>
+		protected override void StartAsync()
+		{
+            mDispatcher.BeginInvoke(new Action(() =>
             {
-                self.OnCompleted();
+                OnCompleted();
             }));
         }
 
         Dispatcher mDispatcher;
         public DispatcherTask(Dispatcher dispatcher)
-            : base(Start)
         {
             mDispatcher = dispatcher;
         }

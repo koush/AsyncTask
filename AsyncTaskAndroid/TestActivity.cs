@@ -17,24 +17,21 @@ namespace AsyncTaskAndroid
 {
 	class UIThreadTask : AsyncTask.AsyncTask
 	{
-		static void NoOp(Task task)
+		protected override void Start()
 		{
 			Console.WriteLine(System.Threading.Thread.CurrentThread.ManagedThreadId);
-			var ui = task as UIThreadTask;
-			var activity = ui.mActivity;
-			Console.WriteLine(ui);
-			Console.WriteLine(activity);
+			Console.WriteLine(this);
+			Console.WriteLine(mActivity);
 
-			activity.RunOnUiThread(() =>
+			mActivity.RunOnUiThread(() =>
 				{
 					Console.WriteLine(System.Threading.Thread.CurrentThread.ManagedThreadId);
-					ui.OnCompleted();
+					OnCompleted();
 				});
 			Console.WriteLine("Done!");
 		}
 
 		public UIThreadTask(Activity activity)
-			: base(NoOp)
 		{
 			mActivity = activity;
 		}
