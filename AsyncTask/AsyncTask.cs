@@ -49,19 +49,10 @@ namespace AsyncTask
         }
     }
 
-    public interface IContinueWithTask
-    {
-        Action<Task> ContinueWith
-        {
-            get;
-            set;
-        }
-    }
-
     public class AsyncTaskScheduler : TaskScheduler
     {
         static AsyncTaskScheduler mScheduler = new AsyncTaskScheduler();
-        
+
         internal static AsyncTaskScheduler Instance
         {
             get
@@ -70,20 +61,49 @@ namespace AsyncTask
             }
         }
 
+        static bool mNeedsHack = Type.GetType("Mono.Runtime") != null;
+        static System.Reflection.MethodInfo mExecute = typeof(Task).GetMethod("Execute", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Default | System.Reflection.BindingFlags.Instance);
+
+        bool TryExecuteTaskHack(Task task)
+        {
+            if (task.IsCompleted)
+                return false;
+
+            if (task.Status == TaskStatus.WaitingToRun)
+            {
+                mExecute.Invoke(task, new object[] { null });
+                return true;
+            }
+
+            return false;
+        }
+
         internal void Run(Task t)
         {
-            TryExecuteTask(t);
+            if (mExecute != null && mNeedsHack)
+            {
+                TryExecuteTaskHack(t);
+            }
+            else
+            {
+                TryExecuteTask(t);
+            }
         }
 
         protected override void QueueTask(Task task)
         {
-            IAsyncTask atask = (IAsyncTask)task;
-            atask.Action();
+            var atask = task as IAsyncTask;
+
+            // see if this is a async task or the async continuation task
+            if (atask == null)
+                Run(task);
+            else
+                atask.Start(task);
         }
 
         protected override bool TryExecuteTaskInline(Task task, bool taskWasPreviouslyQueued)
         {
-            return false;
+            return true;
         }
 
         protected override IEnumerable<Task> GetScheduledTasks()
@@ -94,16 +114,26 @@ namespace AsyncTask
 
     public interface IAsyncTask
     {
-        Action Action
+        Action<Task> Start
         {
             get;
-            set;
         }
-
-
     }
 
-    public class AsyncTask<T> : Task<T>, IAsyncTask, IContinueWithTask
+    public class AsyncTask : AsyncTask<object>
+    {
+        public AsyncTask(Action<Task> start)
+            : base(start)
+        {
+        }
+
+        public void OnCompleted()
+        {
+            OnCompleted(null);
+        }
+    }
+
+    public class AsyncTask<T> : Task<T>, IAsyncTask
     {
         static T Do(StateBase<T> state)
         {
@@ -117,30 +147,21 @@ namespace AsyncTask
             : base(delegate { return Do(state); })
         {
             mState = state;
-            ContinueWith(Continue);
         }
 
-        void Continue(Task t)
-        {
-            ThreadPool.QueueUserWorkItem(o =>
-                {
-                    mAction(t);
-                });
-        }
-
-        public AsyncTask(Action action)
+        public AsyncTask(Action<Task> action)
             : this(new StateBase<T>())
         {
-            (this as IAsyncTask).Action = action;
+            mStart = action;
         }
 
-        public void OnCompleted(T result)
+        protected void OnCompleted(T result)
         {
             mState.Result = result;
             OnFinished();
         }
 
-        public void OnException(Exception ex)
+        protected void OnException(Exception ex)
         {
             mState.Exception = ex;
             OnFinished();
@@ -149,26 +170,14 @@ namespace AsyncTask
         void OnFinished()
         {
             AsyncTaskScheduler.Instance.Run(this);
-            //AsyncTaskScheduler.mQueue.Enqueue(this);
-            //AsyncTaskScheduler.mSemaphore.Release();
         }
 
-        Action IAsyncTask.Action
-        {
-            get;
-            set;
-        }
-
-        Action<Task> mAction;
-        Action<Task> IContinueWithTask.ContinueWith
+        Action<Task> mStart;
+        Action<Task> IAsyncTask.Start
         {
             get
             {
-                return mAction;
-            }
-            set
-            {
-                mAction = value;
+                return mStart;
             }
         }
     }
@@ -180,7 +189,7 @@ namespace AsyncTask
         {
         }
     }
-    
+
     internal class AsyncMethodTask<T> : Task<T>
     {
         public virtual void Continue(Task previous)
@@ -220,18 +229,17 @@ namespace AsyncTask
             Task t = o as Task;
             if (t != null)
             {
-                IContinueWithTask c = t as IContinueWithTask;
-                if (c != null)
-                    c.ContinueWith = Continue;
-                else
-                    t.ContinueWith(Continue);
                 IAsyncTask atask = t as IAsyncTask;
                 if (atask != null)
+                {
+                    t.ContinueWith(Continue, AsyncTaskScheduler.Instance);
                     t.Start(AsyncTaskScheduler.Instance);
-                else if (mState.OriginatingThread == Thread.CurrentThread)
-                    t.Start();
+                }
                 else
-                    t.RunSynchronously();
+                {
+                    t.ContinueWith(Continue);
+                    t.Start();
+                }
             }
             else
             {
@@ -239,7 +247,7 @@ namespace AsyncTask
                 mState.Event.Set();
             }
         }
-        
+
         static T Do(async tasks, State<T> state)
         {
             state.Task.Continue(null);
@@ -252,7 +260,7 @@ namespace AsyncTask
         async mEnumerator;
         State<T> mState;
         internal AsyncMethodTask(async tasks, State<T> state)
-            : base(delegate { return Do(tasks, state); })
+            : base(delegate { return Do(tasks, state); }, TaskCreationOptions.PreferFairness)
         {
             mEnumerator = tasks;
             mState = state;
@@ -265,49 +273,62 @@ namespace AsyncTask
         }
     }
 
+    class WebClientDownloadStringTask : AsyncTask<string>
+    {
+        static void Start(Task task)
+        {
+            var self = task as WebClientDownloadStringTask;
+            DownloadStringCompletedEventHandler handler = null;
+            handler = (e, a) =>
+            {
+                self.mClient.DownloadStringCompleted -= handler;
+                if (a.Error == null)
+                    self.OnCompleted(a.Result);
+                else
+                    self.OnException(a.Error);
+            };
+            self.mClient.DownloadStringCompleted += handler;
+            self.mClient.DownloadStringAsync(new Uri(self.mUrl));
+        }
+
+        public WebClientDownloadStringTask(WebClient client, string url)
+            : base(Start)
+        {
+            mClient = client;
+            mUrl = url;
+        }
+
+        string mUrl;
+        WebClient mClient;
+    }
+
     public static class TaskHelper
     {
-		public static Task<T> Async<T>(this async async)
-		{
-			return new AsyncMethodTask<T>(async);
-		}
+        public static Task<T> Async<T>(this async async)
+        {
+            return new AsyncMethodTask<T>(async);
+        }
 
-		public static Task Async(this async async)
-		{
-			return new AsyncMethodTask(async);
-		}
+        public static Task Async(this async async)
+        {
+            return new AsyncMethodTask(async);
+        }
 
-		/*
-				public static Task<string> DownloadStringTask(this WebClient client, String url)
-				{
-					return new Task<string>(delegate
-					{
-						return client.DownloadString(url);
-					});
-				}
-				*/
+        /*
+                public static Task<string> DownloadStringTask(this WebClient client, String url)
+                {
+                    return new Task<string>(delegate
+                    {
+                        return client.DownloadString(url);
+                    });
+                }
+                */
 
         public static Task<string> DownloadStringTask(this WebClient client, String url)
         {
-            AsyncTask<string> ret = new AsyncTask<string>(delegate
-            {
-                client.DownloadStringAsync(new Uri(url));
-            });
-            DownloadStringCompletedEventHandler handler = null;
-            handler = (sender, args) =>
-                {
-                    Console.WriteLine(url + " done!");
-                    client.DownloadStringCompleted -= handler;
-                    if (args.Error != null)
-                        ret.OnException(args.Error);
-                    else
-                        ret.OnCompleted(args.Result);
-                };
-
-            client.DownloadStringCompleted += handler;
-            return ret;
+            return new WebClientDownloadStringTask(client, url);
         }
-        
+
         public static Task<T> Create<S, T>(Func<S, T> func, S s)
         {
             return new Task<T>(delegate { return func(s); });

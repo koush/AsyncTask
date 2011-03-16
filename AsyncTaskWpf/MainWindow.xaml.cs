@@ -21,40 +21,30 @@ using System.Text.RegularExpressions;
 
 namespace AsyncTaskWpf
 {
-    public class DispatcherAsyncTask : Task, IContinueWithTask
+    public class DispatcherTask : AsyncTask.AsyncTask
     {
+        static void Start(Task t)
+        {
+            var self = t as DispatcherTask;
+            self.mDispatcher.BeginInvoke(new Action(() =>
+            {
+                self.OnCompleted();
+            }));
+        }
+
         Dispatcher mDispatcher;
-        public DispatcherAsyncTask(Dispatcher dispatcher)
-            : base(delegate{})
+        public DispatcherTask(Dispatcher dispatcher)
+            : base(Start)
         {
             mDispatcher = dispatcher;
-            ContinueWith(Continue);
         }
-
-        void Continue(Task t)
-        {
-			mDispatcher.BeginInvoke(mAction, t);
-        }
-
-		Action<Task> mAction;
-		Action<Task> IContinueWithTask.ContinueWith
-		{
-			get
-			{
-				return mAction; 
-			}
-			set
-			{
-				mAction = value;
-			}
-		}
     }
 
     public static class Extensions
     {
         public static Task Dispatcher(this DispatcherObject o)
         {
-            return new DispatcherAsyncTask(o.Dispatcher);
+            return new DispatcherTask(o.Dispatcher);
         }
     }
 
