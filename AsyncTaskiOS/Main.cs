@@ -57,6 +57,8 @@ namespace AsyncTaskiOS
 			yield return firstHrefTask;
 			
 			yield return new UIThreadTask(this);
+			// iOS does not actually need to be invoked onto a UI thread to modify the title.
+			// This is just a test.
 			mButton.SetTitle(firstHrefTask.Result.Substring(0, 10), MonoTouch.UIKit.UIControlState.Normal);
 		}
 
@@ -71,6 +73,7 @@ namespace AsyncTaskiOS
 			
 			mButton.TouchDown += delegate
 			{
+				Console.WriteLine(System.Threading.Thread.CurrentThread.ManagedThreadId);
 				Test().Yield();
 				Console.WriteLine("hello");
 			};
