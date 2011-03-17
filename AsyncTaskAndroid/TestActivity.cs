@@ -17,7 +17,7 @@ namespace AsyncTaskAndroid
 {
 	class UIThreadTask : AsyncTask.AsyncTask
 	{
-		protected override void Start()
+		protected override void StartAsync()
 		{
 			Console.WriteLine(System.Threading.Thread.CurrentThread.ManagedThreadId);
 			Console.WriteLine(this);
