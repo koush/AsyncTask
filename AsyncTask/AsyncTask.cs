@@ -34,14 +34,14 @@ namespace AsyncTask
             }
         }
 
-		static bool mNeedsHack = Environment.OSVersion.Platform != PlatformID.Win32NT && Environment.OSVersion.Platform != PlatformID.Win32S && Environment.OSVersion.Platform != PlatformID.Win32Windows && Environment.OSVersion.Platform != PlatformID.WinCE && Environment.OSVersion.Platform != PlatformID.Xbox;
+		static bool mNeedsHack = Environment.OSVersion.Platform != PlatformID.Win32NT && Environment.OSVersion.Platform != PlatformID.Win32S && Environment.OSVersion.Platform != PlatformID.Win32Windows && Environment.OSVersion.Platform != PlatformID.WinCE && Environment.OSVersion.Platform != PlatformID.Xbox && Environment.Version.Major == 4;
         static System.Reflection.MethodInfo mExecute = typeof(Task).GetMethod("Execute", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Default | System.Reflection.BindingFlags.Instance);
 
         bool TryExecuteTaskHack(Task task)
         {
             if (task.IsCompleted)
                 return false;
-
+			
             if (task.Status == TaskStatus.WaitingToRun)
             {
                 mExecute.Invoke(task, new object[] { null });
